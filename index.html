@@ -312,9 +312,7 @@
   .work-menu.open { opacity: 1; visibility: visible; transform: translateY(0); }
 
   .work-menu a {
-    display: flex;
-    align-items: baseline;
-    gap: 1rem;
+    display: block;
     padding: 0.65rem 1.3rem;
     color: var(--ink);
     text-decoration: none;
@@ -326,14 +324,6 @@
 
   .work-menu a:hover,
   .work-menu a:focus-visible { background: var(--bg-soft); color: var(--accent); }
-
-  .work-menu-year {
-    flex-shrink: 0;
-    min-width: 2.5rem;
-    font-size: 0.7rem;
-    letter-spacing: 0.12em;
-    color: var(--ink-faint);
-  }
 
   @media (max-width: 800px) {
     .work-menu { min-width: 0; width: calc(100vw - 2rem); }
@@ -1176,11 +1166,11 @@
 
 <!-- scurtături spre fiecare spectacol, în ordinea din pagină -->
 <div class="work-menu" id="workMenu" role="menu" aria-label="Jump to a performance">
-  <a href="#trilureel" role="menuitem"><span class="work-menu-year">2025</span><span>triluREELu</span></a>
-  <a href="#somatic-freaks" role="menuitem"><span class="work-menu-year">2024</span><span>Somatic Freaks &mdash; The Proprioceptors Revolution</span></a>
-  <a href="#night-shift" role="menuitem"><span class="work-menu-year">2024</span><span>Tura de noapte / Night Shift</span></a>
-  <a href="#luati-de-val" role="menuitem"><span class="work-menu-year">2022</span><span>Luați de VAL...s</span></a>
-  <a href="#somatic-freaks-1" role="menuitem"><span class="work-menu-year">2023</span><span>Somatic Freaks 1.0</span></a>
+  <a href="#trilureel" role="menuitem">triluREELu</a>
+  <a href="#somatic-freaks" role="menuitem">Somatic Freaks &mdash; The Proprioceptors Revolution</a>
+  <a href="#night-shift" role="menuitem">Tura de noapte / Night Shift</a>
+  <a href="#luati-de-val" role="menuitem">Luați de VAL...s</a>
+  <a href="#somatic-freaks-1" role="menuitem">Somatic Freaks 1.0</a>
 </div>
 
 <!-- ═══════════ HERO — fraza mare de deschidere ═══════════ -->
