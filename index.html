@@ -728,8 +728,19 @@
   .gallery-actions {
     display: flex;
     justify-content: center;
+    flex-wrap: wrap;
+    gap: 1rem;
     margin: 2rem 0 4rem;
   }
+
+  /* butonul plin — duce la pagina dedicată spectacolului */
+  .view-all-btn--solid {
+    background: var(--ink);
+    color: var(--bg);
+    text-decoration: none;
+  }
+
+  .view-all-btn--solid:hover { background: var(--accent); border-color: var(--accent); color: var(--bg); }
 
   .view-all-btn {
     background: transparent;
@@ -1256,6 +1267,10 @@
         View all photos
         <span class="arrow">&rarr;</span>
       </button>
+      <a class="view-all-btn view-all-btn--solid" href="trilureelu.html">
+        Explore triluREELu
+        <span class="arrow">&rarr;</span>
+      </a>
     </div>
 
     <div class="piece-content">
@@ -1361,6 +1376,10 @@
         View all photos
         <span class="arrow">&rarr;</span>
       </button>
+      <a class="view-all-btn view-all-btn--solid" href="somatic-freaks.html">
+        Explore Somatic Freaks
+        <span class="arrow">&rarr;</span>
+      </a>
     </div>
 
     <div class="piece-content">
@@ -1448,6 +1467,10 @@
         View all photos
         <span class="arrow">&rarr;</span>
       </button>
+      <a class="view-all-btn view-all-btn--solid" href="night-shift.html">
+        Explore Night Shift
+        <span class="arrow">&rarr;</span>
+      </a>
     </div>
 
     <div class="piece-content">
@@ -1540,6 +1563,10 @@
         View all photos
         <span class="arrow">&rarr;</span>
       </button>
+      <a class="view-all-btn view-all-btn--solid" href="luati-de-vals.html">
+        Explore Luați de VAL...s
+        <span class="arrow">&rarr;</span>
+      </a>
     </div>
 
     <div class="piece-content">
@@ -1604,6 +1631,13 @@
 
     <div class="gallery">
       <div class="gallery-item sfg1"><img src="https://dancs-benescu.com/sf1_0.jpg" alt="Somatic Freaks 1.0" loading="lazy"></div>
+    </div>
+
+    <div class="gallery-actions">
+      <a class="view-all-btn view-all-btn--solid" href="somatic-freaks-1.html">
+        Explore Somatic Freaks 1.0
+        <span class="arrow">&rarr;</span>
+      </a>
     </div>
 
     <div class="piece-content">
