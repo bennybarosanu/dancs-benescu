@@ -292,6 +292,54 @@
     nav { gap: 1.25rem; font-size: 0.7rem; letter-spacing: 0.1em; }
   }
 
+  /* ============ MENIU „WORK" — scurtături spre spectacole ============
+     Stă în afara <header> pentru că acela folosește mix-blend-mode. */
+  .work-menu {
+    position: fixed;
+    z-index: 200;
+    min-width: 17rem;
+    max-width: calc(100vw - 2rem);
+    padding: 0.5rem 0;
+    background: var(--bg);
+    border: 1px solid var(--line);
+    box-shadow: 0 18px 45px rgba(26, 26, 26, 0.14);
+    opacity: 0;
+    visibility: hidden;
+    transform: translateY(-6px);
+    transition: opacity 0.25s var(--ease), transform 0.25s var(--ease), visibility 0.25s;
+  }
+
+  .work-menu.open { opacity: 1; visibility: visible; transform: translateY(0); }
+
+  .work-menu a {
+    display: flex;
+    align-items: baseline;
+    gap: 1rem;
+    padding: 0.65rem 1.3rem;
+    color: var(--ink);
+    text-decoration: none;
+    font-family: var(--font-sans);
+    font-size: 0.9rem;
+    line-height: 1.35;
+    transition: background 0.2s ease, color 0.2s ease;
+  }
+
+  .work-menu a:hover,
+  .work-menu a:focus-visible { background: var(--bg-soft); color: var(--accent); }
+
+  .work-menu-year {
+    flex-shrink: 0;
+    min-width: 2.5rem;
+    font-size: 0.7rem;
+    letter-spacing: 0.12em;
+    color: var(--ink-faint);
+  }
+
+  @media (max-width: 800px) {
+    .work-menu { min-width: 0; width: calc(100vw - 2rem); }
+    .work-menu a { font-size: 0.85rem; padding: 0.7rem 1.1rem; }
+  }
+
   /* ============ SECTIONS ============ */
   section {
     padding: 6rem 2rem;
@@ -1121,10 +1169,19 @@
   <div class="logo">A.M.D. &amp; V.B.</div>
   <nav>
     <a href="#about">About</a>
-    <a href="#work">Work</a>
+    <a href="#work" id="workLink" aria-haspopup="true" aria-expanded="false" aria-controls="workMenu">Work</a>
     <a href="#contact">Contact</a>
   </nav>
 </header>
+
+<!-- scurtături spre fiecare spectacol, în ordinea din pagină -->
+<div class="work-menu" id="workMenu" role="menu" aria-label="Jump to a performance">
+  <a href="#trilureel" role="menuitem"><span class="work-menu-year">2025</span><span>triluREELu</span></a>
+  <a href="#somatic-freaks" role="menuitem"><span class="work-menu-year">2024</span><span>Somatic Freaks &mdash; The Proprioceptors Revolution</span></a>
+  <a href="#night-shift" role="menuitem"><span class="work-menu-year">2024</span><span>Tura de noapte / Night Shift</span></a>
+  <a href="#luati-de-val" role="menuitem"><span class="work-menu-year">2022</span><span>Luați de VAL...s</span></a>
+  <a href="#somatic-freaks-1" role="menuitem"><span class="work-menu-year">2023</span><span>Somatic Freaks 1.0</span></a>
+</div>
 
 <!-- ═══════════ HERO — fraza mare de deschidere ═══════════ -->
 <section class="hero" id="hero">
@@ -1939,6 +1996,72 @@
     });
   });
 
+  /* ============ MENIU „WORK" — scurtături spre spectacole ============ */
+  var workLink = document.getElementById('workLink');
+  var workMenu = document.getElementById('workMenu');
+  var headerEl = document.getElementById('header');
+
+  function workMenuOpen() {
+    return workMenu && workMenu.classList.contains('open');
+  }
+
+  function placeWorkMenu() {
+    var r = workLink.getBoundingClientRect();
+    var w = workMenu.offsetWidth;
+    var left = Math.min(r.left, window.innerWidth - w - 16);
+    workMenu.style.left = Math.max(16, left) + 'px';
+    workMenu.style.top = (r.bottom + 12) + 'px';
+  }
+
+  function closeWorkMenu() {
+    if (!workMenu) return;
+    workMenu.classList.remove('open');
+    workLink.setAttribute('aria-expanded', 'false');
+  }
+
+  function openWorkMenu() {
+    placeWorkMenu();
+    workMenu.classList.add('open');
+    workLink.setAttribute('aria-expanded', 'true');
+  }
+
+  // sare la spectacol, lăsând loc pentru bara fixă de sus
+  function scrollToPiece(hash) {
+    var el = document.querySelector(hash);
+    if (!el) return;
+    var offset = (headerEl ? headerEl.offsetHeight : 0) + 56;
+    window.scrollTo({
+      top: el.getBoundingClientRect().top + window.scrollY - offset,
+      behavior: reduceMotion ? 'auto' : 'smooth'
+    });
+  }
+
+  if (workLink && workMenu) {
+    workLink.addEventListener('click', function (e) {
+      e.preventDefault();
+      if (workMenuOpen()) { closeWorkMenu(); } else { openWorkMenu(); }
+    });
+
+    workMenu.querySelectorAll('a').forEach(function (a) {
+      a.addEventListener('click', function (e) {
+        e.preventDefault();
+        closeWorkMenu();
+        scrollToPiece(a.getAttribute('href'));
+      });
+    });
+
+    document.addEventListener('click', function (e) {
+      if (!workMenuOpen()) return;
+      if (e.target === workLink || workMenu.contains(e.target)) return;
+      closeWorkMenu();
+    });
+
+    window.addEventListener('scroll', closeWorkMenu, { passive: true });
+    window.addEventListener('resize', function () {
+      if (workMenuOpen()) placeWorkMenu();
+    });
+  }
+
   /* ============ POZĂ MĂRITĂ ============ */
   var zoom = document.getElementById('zoom');
   var zoomImg = zoom ? zoom.querySelector('img') : null;
@@ -1998,7 +2121,9 @@
     var zoomOpen = zoom && zoom.classList.contains('open');
 
     if (e.key === 'Escape') {
-      if (zoomOpen) { closeZoom(); } else { closeAllLightboxes(); }
+      if (zoomOpen) { closeZoom(); }
+      else if (workMenuOpen()) { closeWorkMenu(); }
+      else { closeAllLightboxes(); }
       return;
     }
 
