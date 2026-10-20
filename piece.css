@@ -93,6 +93,24 @@ img { max-width: 100%; display: block; }
   to   { transform: scale(1.14) translate3d(-1.5%, -1.5%, 0); }
 }
 
+/* ============ HERO PENTRU VIDEO VERTICAL ============
+   Videoul se vede întreg (nu tăiat), iar golul din lateral e umplut
+   de aceeași imagine, mărită și neclară. */
+.piece-hero--portrait .piece-hero-media {
+  object-fit: contain;
+  animation: none;
+}
+
+.piece-hero-backdrop {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  filter: blur(45px) brightness(0.5) saturate(1.1);
+  transform: scale(1.25);
+}
+
 /* întunecă imaginea ca textul să rămână lizibil */
 .piece-hero-overlay {
   position: absolute;
@@ -228,6 +246,40 @@ body.scrolled .piece-hero-hint { opacity: 0; }
 }
 
 .credits dd { margin: 0 0 0.3rem; font-size: 0.95rem; }
+
+/* Varianta cu poză în spate, care face zoom lent — ține viul
+   hero-ului și mai jos în pagină, cât timp se citește textul. */
+.credits--media {
+  position: relative;
+  overflow: hidden;
+  padding: 2.75rem 2.5rem 3rem;
+  background: var(--ink);
+  color: var(--bg);
+  align-self: start;
+}
+
+.credits-bg {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  opacity: 0.32;
+  animation: ken-burns 26s var(--ease) infinite alternate;
+}
+
+/* textul stă peste poză */
+.credits--media > *:not(.credits-bg) { position: relative; z-index: 1; }
+
+.credits--media .block-label { color: rgba(244, 240, 232, 0.55); }
+.credits--media dt { color: rgba(244, 240, 232, 0.45); }
+
+.credits--media dd {
+  font-family: var(--font-serif);
+  font-weight: 300;
+  font-size: 1.05rem;
+  color: var(--bg);
+}
 
 /* ============ CITATE DIN PRESĂ ============ */
 .quotes {
@@ -452,7 +504,8 @@ body.zoom-open { overflow: hidden; }
   .piece-topbar { padding: 1rem 1.25rem; font-size: 0.7rem; letter-spacing: 0.1em; }
   .piece-topbar nav { gap: 1.25rem; }
 
-  .piece-hero-inner { padding: 0 1.25rem 4rem; }
+  /* loc sub text pentru indicatorul „Scroll", ca să nu se suprapună */
+  .piece-hero-inner { padding: 0 1.25rem 6.5rem; }
   .piece-hero-sound { right: 1.25rem; bottom: 1.25rem; }
 
   .piece-page { padding: 4rem 1.25rem; }

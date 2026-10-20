@@ -28,7 +28,10 @@
   </nav>
 </div>
 
-<header class="piece-hero">
+<header class="piece-hero piece-hero--portrait">
+  <!-- videoul e vertical, așa că se vede întreg; golul lateral îl umple
+       aceeași imagine, mărită și neclară -->
+  <img class="piece-hero-backdrop" src="https://dancs-benescu.com/v01.jpg" alt="" aria-hidden="true">
   <video class="piece-hero-media" id="heroVideo"
          poster="https://dancs-benescu.com/v01.jpg"
          autoplay muted loop playsinline preload="metadata">
@@ -82,7 +85,8 @@
         </p>
       </div>
 
-      <div class="credits">
+      <div class="credits credits--media">
+        <img class="credits-bg" src="https://dancs-benescu.com/v02.jpg" alt="" aria-hidden="true">
         <p class="block-label">Credits</p>
         <dl>
           <dt>Concept, choreography, performance</dt>
