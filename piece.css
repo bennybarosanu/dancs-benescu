@@ -255,8 +255,14 @@ body.scrolled .piece-hero-hint { opacity: 0; }
   color: var(--ink-faint);
 }
 
-.quote figcaption a { color: var(--ink-faint); }
-.quote figcaption a:hover { color: var(--accent); }
+.quote figcaption a {
+  color: var(--ink-soft);
+  text-decoration: none;
+  border-bottom: 1px solid var(--line);
+  transition: color 0.2s ease, border-color 0.2s ease;
+}
+
+.quote figcaption a:hover { color: var(--accent); border-bottom-color: var(--accent); }
 
 /* un citat mare, singur pe rând */
 .pull-quote {
