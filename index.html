@@ -634,6 +634,7 @@
     height: 100%;
     object-fit: cover;
     display: block;
+    cursor: zoom-in;
     transition: transform 1.2s var(--ease);
   }
 
@@ -793,7 +794,7 @@
 
   .lightbox-grid img:hover { filter: brightness(1.08); }
 
-  body.lightbox-open { overflow: hidden; }
+  body.lightbox-open, body.zoom-open { overflow: hidden; }
 
   /* poza mărită peste galerie, la click */
   .zoom {
@@ -1882,24 +1883,31 @@
   var zoom = document.getElementById('zoom');
   var zoomImg = zoom ? zoom.querySelector('img') : null;
 
-  document.querySelectorAll('.lightbox-grid img').forEach(function (img) {
+  function closeZoom() {
+    if (!zoom) return;
+    zoom.classList.remove('open');
+    document.body.classList.remove('zoom-open');
+  }
+
+  document.querySelectorAll('.lightbox-grid img, .gallery-item img').forEach(function (img) {
     img.addEventListener('click', function () {
       if (!zoom || !zoomImg) return;
       zoomImg.src = img.src;
       zoomImg.alt = img.alt;
       zoom.classList.add('open');
+      document.body.classList.add('zoom-open');
     });
   });
 
   if (zoom) {
-    zoom.addEventListener('click', function () { zoom.classList.remove('open'); });
+    zoom.addEventListener('click', closeZoom);
   }
 
   /* ============ ESC ÎNCHIDE ============ */
   document.addEventListener('keydown', function (e) {
     if (e.key !== 'Escape') return;
     if (zoom && zoom.classList.contains('open')) {
-      zoom.classList.remove('open');
+      closeZoom();
     } else {
       closeAllLightboxes();
     }
