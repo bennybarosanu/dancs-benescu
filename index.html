@@ -834,6 +834,45 @@
     border-radius: 2px;
   }
 
+  .zoom-nav {
+    position: absolute;
+    top: 50%;
+    transform: translateY(-50%);
+    background: none;
+    border: none;
+    color: rgba(255, 255, 255, 0.7);
+    font-family: var(--font-sans);
+    font-size: 2rem;
+    line-height: 1;
+    padding: 1.2rem;
+    cursor: pointer;
+    z-index: 2;
+    transition: color 0.2s ease;
+  }
+
+  .zoom-nav:hover { color: #fff; }
+  .zoom-prev { left: 0.5rem; }
+  .zoom-next { right: 0.5rem; }
+  .zoom-nav[hidden] { display: none; }
+
+  .zoom-counter {
+    position: absolute;
+    bottom: 1.5rem;
+    left: 50%;
+    transform: translateX(-50%);
+    color: rgba(255, 255, 255, 0.55);
+    font-family: var(--font-sans);
+    font-size: 0.75rem;
+    letter-spacing: 0.15em;
+  }
+
+  @media (max-width: 800px) {
+    .zoom { padding: 1rem; }
+    .zoom-nav { font-size: 1.6rem; padding: 0.9rem 0.6rem; }
+    .zoom-prev { left: 0; }
+    .zoom-next { right: 0; }
+  }
+
   /* ============ VENUES ============ */
   .venues {
     padding: 3rem 0;
@@ -1739,7 +1778,12 @@
 </div>
 
 <!-- poza mărită la click, peste galerie -->
-<div class="zoom" id="zoom"><img alt=""></div>
+<div class="zoom" id="zoom">
+  <button class="zoom-nav zoom-prev" id="zoomPrev" aria-label="Previous photo">&larr;</button>
+  <img alt="">
+  <button class="zoom-nav zoom-next" id="zoomNext" aria-label="Next photo">&rarr;</button>
+  <span class="zoom-counter" id="zoomCounter"></span>
+</div>
 
 <!-- ═══════════ CONTACT ═══════════ -->
 <footer id="contact">
@@ -1898,6 +1942,23 @@
   /* ============ POZĂ MĂRITĂ ============ */
   var zoom = document.getElementById('zoom');
   var zoomImg = zoom ? zoom.querySelector('img') : null;
+  var zoomPrev = document.getElementById('zoomPrev');
+  var zoomNext = document.getElementById('zoomNext');
+  var zoomCounter = document.getElementById('zoomCounter');
+  var zoomItems = [];
+  var zoomIndex = 0;
+
+  function showZoomAt(i) {
+    if (!zoomItems.length) return;
+    zoomIndex = (i + zoomItems.length) % zoomItems.length;
+    var img = zoomItems[zoomIndex];
+    zoomImg.src = img.src;
+    zoomImg.alt = img.alt;
+    var many = zoomItems.length > 1;
+    zoomPrev.hidden = !many;
+    zoomNext.hidden = !many;
+    zoomCounter.textContent = many ? (zoomIndex + 1) + ' / ' + zoomItems.length : '';
+  }
 
   function closeZoom() {
     if (!zoom) return;
@@ -1908,8 +1969,9 @@
   document.querySelectorAll('.lightbox-grid img, .gallery-item img').forEach(function (img) {
     img.addEventListener('click', function () {
       if (!zoom || !zoomImg) return;
-      zoomImg.src = img.src;
-      zoomImg.alt = img.alt;
+      var group = img.closest('.lightbox-grid') || img.closest('.gallery');
+      zoomItems = group ? Array.prototype.slice.call(group.querySelectorAll('img')) : [img];
+      showZoomAt(zoomItems.indexOf(img));
       zoom.classList.add('open');
       document.body.classList.add('zoom-open');
     });
@@ -1917,15 +1979,37 @@
 
   if (zoom) {
     zoom.addEventListener('click', closeZoom);
+
+    zoomPrev.addEventListener('click', function (e) {
+      e.stopPropagation();
+      showZoomAt(zoomIndex - 1);
+    });
+
+    zoomNext.addEventListener('click', function (e) {
+      e.stopPropagation();
+      showZoomAt(zoomIndex + 1);
+    });
+
+    zoomImg.addEventListener('click', function (e) { e.stopPropagation(); });
   }
 
-  /* ============ ESC ÎNCHIDE ============ */
+  /* ============ TASTATURĂ: ESC închide, săgeți schimbă poza ============ */
   document.addEventListener('keydown', function (e) {
-    if (e.key !== 'Escape') return;
-    if (zoom && zoom.classList.contains('open')) {
-      closeZoom();
-    } else {
-      closeAllLightboxes();
+    var zoomOpen = zoom && zoom.classList.contains('open');
+
+    if (e.key === 'Escape') {
+      if (zoomOpen) { closeZoom(); } else { closeAllLightboxes(); }
+      return;
+    }
+
+    if (!zoomOpen) return;
+
+    if (e.key === 'ArrowLeft') {
+      e.preventDefault();
+      showZoomAt(zoomIndex - 1);
+    } else if (e.key === 'ArrowRight') {
+      e.preventDefault();
+      showZoomAt(zoomIndex + 1);
     }
   });
 
