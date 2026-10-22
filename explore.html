@@ -1,0 +1,569 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<title>Explore &mdash; Alexandra Mihaela Dancs &amp; Vlad Benescu</title>
+<meta name="description" content="Browse the performances of Alexandra Mihaela Dancs and Vlad Benescu — swipe sideways between pieces, scroll down through each.">
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500&family=Fraunces:opsz,wght@9..144,300;9..144,400;9..144,500&display=swap" rel="stylesheet">
+
+<style>
+/* ═══════════════════════════════════════════════════════════════
+   PROTOTIP — navigare pe două axe.
+   Pe orizontală: un spectacol pe ecran, cu „snap".
+   Pe verticală: fiecare coloană își derulează propriul conținut.
+   Partea de bază e doar CSS; JS-ul adaugă doar săgeți și tastatură.
+   ═══════════════════════════════════════════════════════════════ */
+:root {
+  --bg: #f4f0e8;
+  --bg-soft: #ebe5d8;
+  --ink: #1a1a1a;
+  --ink-soft: #5a5a5a;
+  --ink-faint: #8a8a8a;
+  --accent: #c2410c;
+  --accent-light: #ff7a4d;
+  --line: rgba(26, 26, 26, 0.12);
+  --font-sans: 'Inter', system-ui, -apple-system, sans-serif;
+  --font-serif: 'Fraunces', Georgia, serif;
+  --ease: cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+* { margin: 0; padding: 0; box-sizing: border-box; }
+
+html, body { height: 100%; overflow: hidden; }
+
+body {
+  background: var(--ink);
+  color: var(--ink);
+  font-family: var(--font-sans);
+  font-weight: 300;
+  -webkit-font-smoothing: antialiased;
+}
+
+img { display: block; max-width: 100%; }
+
+/* ============ BANDA ORIZONTALĂ ============ */
+.deck {
+  display: flex;
+  height: 100dvh;
+  overflow-x: auto;
+  overflow-y: hidden;
+  scroll-snap-type: x mandatory;
+  overscroll-behavior-x: contain;
+  scroll-behavior: smooth;
+}
+
+.deck::-webkit-scrollbar { display: none; }
+.deck { scrollbar-width: none; }
+
+/* ============ O COLOANĂ = UN SPECTACOL ============ */
+.col {
+  flex: 0 0 100%;
+  width: 100%;
+  height: 100dvh;
+  overflow-y: auto;
+  overflow-x: hidden;
+  scroll-snap-align: start;
+  overscroll-behavior-y: contain;
+  background: var(--bg);
+  -webkit-overflow-scrolling: touch;
+}
+
+.col::-webkit-scrollbar { width: 0; }
+.col { scrollbar-width: none; }
+
+/* pe ecran lat arătăm două coloane odată */
+@media (min-width: 1100px) {
+  .col { flex-basis: 50%; width: 50%; }
+}
+
+/* ============ CAPUL COLOANEI ============ */
+.col-hero {
+  position: relative;
+  height: 62dvh;
+  min-height: 20rem;
+  overflow: hidden;
+  background: var(--ink);
+  display: flex;
+  align-items: flex-end;
+}
+
+.col-hero img {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  animation: drift 24s var(--ease) infinite alternate;
+}
+
+@keyframes drift {
+  from { transform: scale(1.04); }
+  to   { transform: scale(1.16) translate3d(-1.5%, -1.5%, 0); }
+}
+
+.col-hero::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(180deg, rgba(8,8,8,0.5) 0%, rgba(8,8,8,0.05) 40%, rgba(8,8,8,0.88) 100%);
+}
+
+.col-hero-text {
+  position: relative;
+  z-index: 1;
+  padding: 0 1.5rem 2rem;
+  color: #fff;
+}
+
+.col-meta {
+  font-size: 0.65rem;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  color: rgba(255,255,255,0.6);
+  margin-bottom: 0.9rem;
+}
+
+.col-title {
+  font-family: var(--font-serif);
+  font-weight: 300;
+  font-size: clamp(2rem, 7vw, 3.4rem);
+  line-height: 0.98;
+  letter-spacing: -0.02em;
+}
+
+.col-title em { font-style: italic; color: var(--accent-light); }
+
+/* ============ CORPUL COLOANEI ============ */
+.col-body { padding: 2.5rem 1.5rem 7rem; }
+
+.col-body p {
+  font-size: 0.98rem;
+  line-height: 1.7;
+  color: var(--ink-soft);
+  margin-bottom: 1.1rem;
+}
+
+.col-body p:first-child { color: var(--ink); font-size: 1.08rem; }
+.col-body em { font-style: italic; }
+
+.col-label {
+  font-size: 0.65rem;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  color: var(--ink-faint);
+  margin: 2.5rem 0 1rem;
+}
+
+.col-shot {
+  width: 100%;
+  aspect-ratio: 3/2;
+  object-fit: cover;
+  background: var(--bg-soft);
+  margin-bottom: 0.5rem;
+}
+
+.col-facts dt {
+  font-size: 0.62rem;
+  letter-spacing: 0.15em;
+  text-transform: uppercase;
+  color: var(--ink-faint);
+  margin-top: 0.9rem;
+}
+
+.col-facts dd { font-family: var(--font-serif); font-size: 0.98rem; }
+
+.col-venues { list-style: none; }
+.col-venues li { font-size: 0.92rem; color: var(--ink-soft); padding: 0.35rem 0; border-bottom: 1px solid var(--line); }
+
+.col-cta {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.7rem;
+  margin-top: 2.5rem;
+  padding: 0.95rem 1.8rem;
+  background: var(--ink);
+  color: var(--bg);
+  text-decoration: none;
+  font-size: 0.7rem;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  transition: background 0.3s;
+}
+
+.col-cta:hover { background: var(--accent); }
+
+/* indiciu că se derulează în jos — dispare la primul scroll */
+.col-scroll-cue {
+  position: absolute;
+  right: 1.5rem;
+  bottom: 2rem;
+  z-index: 2;
+  color: rgba(255,255,255,0.6);
+  font-size: 0.6rem;
+  letter-spacing: 0.25em;
+  text-transform: uppercase;
+  transition: opacity 0.4s;
+}
+
+.col.scrolled .col-scroll-cue { opacity: 0; }
+
+/* ============ BARA DE SUS ============ */
+.bar {
+  position: fixed;
+  top: 0; left: 0; right: 0;
+  z-index: 50;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: calc(env(safe-area-inset-top, 0px) + 0.9rem) 1.25rem 0.9rem;
+  color: #fff;
+  mix-blend-mode: difference;
+  font-size: 0.7rem;
+  letter-spacing: 0.15em;
+  text-transform: uppercase;
+}
+
+.bar a { color: inherit; text-decoration: none; }
+
+/* ============ NAVIGAȚIE ORIZONTALĂ ============ */
+.rail {
+  position: fixed;
+  left: 50%;
+  transform: translateX(-50%);
+  bottom: calc(env(safe-area-inset-bottom, 0px) + 1.1rem);
+  z-index: 50;
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 0.55rem 0.9rem;
+  background: rgba(26, 26, 26, 0.82);
+  backdrop-filter: blur(8px);
+  border-radius: 2rem;
+}
+
+.rail button {
+  background: none;
+  border: none;
+  color: rgba(244, 240, 232, 0.85);
+  font-family: var(--font-sans);
+  font-size: 1rem;
+  line-height: 1;
+  padding: 0.2rem 0.4rem;
+  cursor: pointer;
+}
+
+.rail button:disabled { opacity: 0.25; cursor: default; }
+
+.dots { display: flex; gap: 0.5rem; }
+
+.dot {
+  width: 6px; height: 6px;
+  border-radius: 50%;
+  background: rgba(244, 240, 232, 0.35);
+  border: none;
+  padding: 0;
+  cursor: pointer;
+  transition: background 0.3s, transform 0.3s;
+}
+
+.dot[aria-current="true"] { background: var(--accent-light); transform: scale(1.5); }
+
+.rail-name {
+  color: rgba(244, 240, 232, 0.9);
+  font-size: 0.62rem;
+  letter-spacing: 0.15em;
+  text-transform: uppercase;
+  min-width: 7rem;
+  text-align: center;
+}
+
+@media (max-width: 420px) {
+  .rail-name { display: none; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .deck { scroll-behavior: auto; }
+  .col-hero img { animation: none; }
+}
+</style>
+</head>
+<body>
+
+<div class="bar">
+  <a href="index.html">&larr; A.M.D. &amp; V.B.</a>
+  <span>Swipe &harr;</span>
+</div>
+
+<div class="deck" id="deck">
+
+  <!-- ─────── 1. triluREELu ─────── -->
+  <section class="col" data-name="triluREELu">
+    <div class="col-hero">
+      <img src="https://dancs-benescu.com/tr01.jpg" alt="triluREELu">
+      <div class="col-hero-text">
+        <p class="col-meta">2025 &middot; 70 min</p>
+        <h2 class="col-title">triluREELu</h2>
+      </div>
+      <span class="col-scroll-cue">Scroll &darr;</span>
+    </div>
+    <div class="col-body">
+      <p>The plunge of two performers into a phone locked on the most diverse reels &mdash; from viral dances to motivational speeches.</p>
+      <p>The feed is on stage, digital scenography and bodies interact in hybrid 3D reels, captions and crowded music become language, vanity and rhythm grow into a frenzy. The piece is built entirely of small fragments following one another at a maddening speed, obeying no rule other than the rule of the algorithm.</p>
+
+      <p class="col-label">Images</p>
+      <img class="col-shot" src="https://dancs-benescu.com/tr07.jpg" alt="triluREELu" loading="lazy">
+      <img class="col-shot" src="https://dancs-benescu.com/tr06.jpg" alt="triluREELu" loading="lazy">
+
+      <p class="col-label">Credits</p>
+      <dl class="col-facts">
+        <dt>Concept &amp; performance</dt><dd>Alexandra Mihaela Dancs &amp; Vlad Benescu</dd>
+        <dt>Multimedia</dt><dd>Alexandru Claudiu Maxim</dd>
+        <dt>Sound design</dt><dd>Lala Mișosniky</dd>
+        <dt>Premiere</dt><dd>October 2025 &middot; CNDB</dd>
+      </dl>
+
+      <p class="col-label">Presented at</p>
+      <ul class="col-venues">
+        <li>The National Centre for Dance Bucharest</li>
+        <li>Teatrul Masca</li>
+        <li>/SAC @ Malmaison</li>
+        <li>Underground Festival XVI, Arad 2026</li>
+      </ul>
+
+      <a class="col-cta" href="trilureelu.html">Full page <span>&rarr;</span></a>
+    </div>
+  </section>
+
+  <!-- ─────── 2. Somatic Freaks ─────── -->
+  <section class="col" data-name="Somatic Freaks">
+    <div class="col-hero">
+      <img src="https://dancs-benescu.com/sf01.jpg" alt="Somatic Freaks">
+      <div class="col-hero-text">
+        <p class="col-meta">2024 &middot; Durational &middot; 3 hours</p>
+        <h2 class="col-title">Somatic Freaks<br><em>The Proprioceptors Revolution</em></h2>
+      </div>
+      <span class="col-scroll-cue">Scroll &darr;</span>
+    </div>
+    <div class="col-body">
+      <p>Three hours of two bodies negotiating with a large tandem balancing apparatus &mdash; a living laboratory of failure, recovery and trust.</p>
+      <p>Their physicality adapts to its specific mechanics in a choreography of subtle movements. An endless dialogue is created between the ephemerality of stability and the unpredictability of moments of unbalance. The audience is free to come and go: what you see depends on when you arrive.</p>
+
+      <p class="col-label">Images</p>
+      <img class="col-shot" src="https://dancs-benescu.com/sf07.jpg" alt="Somatic Freaks" loading="lazy">
+      <img class="col-shot" src="https://dancs-benescu.com/sf02.jpg" alt="Somatic Freaks" loading="lazy">
+
+      <p class="col-label">Credits</p>
+      <dl class="col-facts">
+        <dt>Concept &amp; performance</dt><dd>Alexandra Mihaela Dancs &amp; Vlad Benescu</dd>
+        <dt>Sound design</dt><dd>Lala Mișosniky</dd>
+        <dt>Premiere</dt><dd>October 2024 &middot; Teatrul Recul</dd>
+      </dl>
+
+      <p class="col-label">Presented at</p>
+      <ul class="col-venues">
+        <li>Moving Balkans Showcase, Novi Sad 2026</li>
+        <li>Dance Week Festival, Zagreb 2026</li>
+        <li>Tranzit House, Cluj</li>
+        <li>Galateca &middot; /SAC @ Malmaison</li>
+      </ul>
+
+      <a class="col-cta" href="somatic-freaks.html">Full page <span>&rarr;</span></a>
+    </div>
+  </section>
+
+  <!-- ─────── 3. Night Shift ─────── -->
+  <section class="col" data-name="Night Shift">
+    <div class="col-hero">
+      <img src="https://dancs-benescu.com/n4.jpg" alt="Tura de noapte">
+      <div class="col-hero-text">
+        <p class="col-meta">2024 &middot; 70 min &middot; 14+</p>
+        <h2 class="col-title">Tura de noapte<br><em>Night Shift</em></h2>
+      </div>
+      <span class="col-scroll-cue">Scroll &darr;</span>
+    </div>
+    <div class="col-body">
+      <p>Two strangers experience a night together during which nothing is what it seems &mdash; not even time.</p>
+      <p>The lines are music, the light is disco, and the bodies pulsate on an army of techno bass. Mircea and Irina meet and fall in love when neither of them has anything left to lose, in a hypnotic performative hybrid the company calls dancephonic-theatre.</p>
+
+      <p class="col-label">Images</p>
+      <img class="col-shot" src="https://dancs-benescu.com/n3.jpg" alt="Night Shift" loading="lazy">
+      <img class="col-shot" src="https://dancs-benescu.com/n6.jpg" alt="Night Shift" loading="lazy">
+
+      <p class="col-label">Credits</p>
+      <dl class="col-facts">
+        <dt>Written by</dt><dd>Mihai Ivașcu</dd>
+        <dt>Concept &amp; performance</dt><dd>Alexandra Mihaela Dancs &amp; Vlad Benescu</dd>
+        <dt>Music</dt><dd>Lala Mișosniky</dd>
+        <dt>Premiere</dt><dd>February 2024 &middot; Casa Kerim</dd>
+      </dl>
+
+      <p class="col-label">Presented at</p>
+      <ul class="col-venues">
+        <li>Romanian National Theatre Festival 2024</li>
+        <li>Bucharest Fringe 2024</li>
+        <li>Teatrul Național București</li>
+        <li>Club Control &middot; Green Hours</li>
+      </ul>
+
+      <a class="col-cta" href="night-shift.html">Full page <span>&rarr;</span></a>
+    </div>
+  </section>
+
+  <!-- ─────── 4. Luați de VAL...s ─────── -->
+  <section class="col" data-name="Luați de VAL...s">
+    <div class="col-hero">
+      <img src="https://dancs-benescu.com/v01.jpg" alt="Luați de VAL...s">
+      <div class="col-hero-text">
+        <p class="col-meta">2022 &middot; Site-specific &middot; Debut</p>
+        <h2 class="col-title">Luați de <em>VAL...s</em></h2>
+      </div>
+      <span class="col-scroll-cue">Scroll &darr;</span>
+    </div>
+    <div class="col-body">
+      <p>Their first piece as a duo &mdash; made for a house, and for the way a wave keeps reforming instead of ending.</p>
+      <p>Performed in all the rooms of a single-storey house in the old Jewish quarter, for around twenty people, with the light operated live by the performers. The creative process was nourished during the summer by long surfing sessions on the Black Sea.</p>
+
+      <p class="col-label">Images</p>
+      <img class="col-shot" src="https://dancs-benescu.com/v02.jpg" alt="Luați de VAL...s" loading="lazy">
+      <img class="col-shot" src="https://dancs-benescu.com/v03.jpg" alt="Luați de VAL...s" loading="lazy">
+
+      <p class="col-label">Credits</p>
+      <dl class="col-facts">
+        <dt>Concept &amp; performance</dt><dd>Alexandra Mihaela Dancs &amp; Vlad Benescu</dd>
+        <dt>Sound architecture</dt><dd>Lala Mișosniky</dd>
+        <dt>Premiere</dt><dd>October 2022 &middot; Casa Kerim</dd>
+      </dl>
+
+      <p class="col-label">Presented at</p>
+      <ul class="col-venues">
+        <li>Casa Kerim &mdash; Hearth</li>
+        <li>CNDB Itinerant 2023</li>
+        <li>Bucharest Collage Festival 2024</li>
+      </ul>
+
+      <a class="col-cta" href="luati-de-vals.html">Full page <span>&rarr;</span></a>
+    </div>
+  </section>
+
+  <!-- ─────── 5. Somatic Freaks 1.0 ─────── -->
+  <section class="col" data-name="Somatic Freaks 1.0">
+    <div class="col-hero">
+      <img src="https://dancs-benescu.com/sf1_0.jpg" alt="Somatic Freaks 1.0">
+      <div class="col-hero-text">
+        <p class="col-meta">2023 &middot; Performance</p>
+        <h2 class="col-title">Somatic Freaks <em>1.0</em></h2>
+      </div>
+      <span class="col-scroll-cue">Scroll &darr;</span>
+    </div>
+    <div class="col-body">
+      <p>An internal reality, difficult to perceive from the outside &mdash; narrated out loud, in real time.</p>
+      <p>The two continuously describe what they feel happening inside their musculoskeletal structures, entering a dialogue generated by conscious movement and the verbalization of every physical detail. This is where the Somatic Freaks research began.</p>
+
+      <p class="col-label">Credits</p>
+      <dl class="col-facts">
+        <dt>Concept &amp; performance</dt><dd>Alexandra Mihaela Dancs &amp; Vlad Benescu</dd>
+        <dt>Premiere</dt><dd>May 2023 &middot; Stagiune la Mansardă</dd>
+      </dl>
+
+      <p class="col-label">Presented at</p>
+      <ul class="col-venues">
+        <li>Stagiune la Mansardă</li>
+        <li>The National Centre for Dance Bucharest</li>
+        <li>Fictions, my body &mdash; 2nd edition</li>
+      </ul>
+
+      <a class="col-cta" href="somatic-freaks-1.html">Full page <span>&rarr;</span></a>
+    </div>
+  </section>
+
+</div>
+
+<div class="rail">
+  <button id="prev" aria-label="Previous performance">&larr;</button>
+  <span class="dots" id="dots"></span>
+  <span class="rail-name" id="railName"></span>
+  <button id="next" aria-label="Next performance">&rarr;</button>
+</div>
+
+<script>
+(function () {
+  'use strict';
+
+  var deck = document.getElementById('deck');
+  var cols = Array.prototype.slice.call(deck.querySelectorAll('.col'));
+  var dotsBox = document.getElementById('dots');
+  var railName = document.getElementById('railName');
+  var prev = document.getElementById('prev');
+  var next = document.getElementById('next');
+  /* `target` e coloana spre care mergem. Cât timp rulează o derulare
+     pornită de noi, el e sursa adevărului — altfel citirea poziției
+     s-ar face la mijlocul animației și indexul ar sări aiurea. */
+  var target = 0;
+  var lockUntil = 0;
+
+  // câte coloane încap pe ecran (1 pe telefon, 2 pe ecran lat)
+  function perView() {
+    return Math.max(1, Math.round(deck.clientWidth / cols[0].getBoundingClientRect().width));
+  }
+
+  function indexFromScroll() {
+    return Math.round(deck.scrollLeft / cols[0].getBoundingClientRect().width);
+  }
+
+  cols.forEach(function (col, i) {
+    var d = document.createElement('button');
+    d.className = 'dot';
+    d.setAttribute('aria-label', col.dataset.name);
+    d.addEventListener('click', function () { goTo(i); });
+    dotsBox.appendChild(d);
+
+    // ascunde indiciul „Scroll ↓" după ce coloana a fost derulată
+    col.addEventListener('scroll', function () {
+      col.classList.toggle('scrolled', col.scrollTop > 40);
+    }, { passive: true });
+  });
+
+  var dots = Array.prototype.slice.call(dotsBox.children);
+
+  function paint(i) {
+    dots.forEach(function (d, n) { d.setAttribute('aria-current', String(n === i)); });
+    railName.textContent = cols[i] ? cols[i].dataset.name : '';
+    prev.disabled = i === 0;
+    next.disabled = i >= cols.length - perView();
+  }
+
+  function goTo(i) {
+    target = Math.max(0, Math.min(cols.length - perView(), i));
+    lockUntil = Date.now() + 700;
+    deck.scrollTo({ left: cols[target].offsetLeft, behavior: 'smooth' });
+    paint(target);
+  }
+
+  // derulare cu degetul: reluăm poziția reală, dar nu în timpul animației
+  deck.addEventListener('scroll', function () {
+    window.clearTimeout(deck._t);
+    deck._t = window.setTimeout(function () {
+      if (Date.now() < lockUntil) return;
+      target = indexFromScroll();
+      paint(target);
+    }, 80);
+  }, { passive: true });
+
+  prev.addEventListener('click', function () { goTo(target - 1); });
+  next.addEventListener('click', function () { goTo(target + 1); });
+
+  document.addEventListener('keydown', function (e) {
+    if (e.key === 'ArrowRight') { e.preventDefault(); goTo(target + 1); }
+    else if (e.key === 'ArrowLeft') { e.preventDefault(); goTo(target - 1); }
+  });
+
+  window.addEventListener('resize', function () { paint(target); });
+  paint(0);
+})();
+</script>
+</body>
+</html>
